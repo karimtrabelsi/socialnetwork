@@ -13,7 +13,7 @@ import { NiveauForm } from "./forms/niveaux-form";
 import { Niveau } from "@prisma/client";
 import React from "react";
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Dashboard",
   description: "Example dashboard app using the components.",
 };
