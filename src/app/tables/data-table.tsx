@@ -112,7 +112,9 @@ export function TableSpinner() {
     </>
   );
 }
-
+type PropsType = {
+  func: (data: Niveau) => void;
+};
 export function DataTableDemo(props: any) {
   const queryClient = useQueryClient();
   const { setIsUpdate } = useMyStore();
