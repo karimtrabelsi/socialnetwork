@@ -22,6 +22,7 @@ import axios from "axios";
 import { Icons } from "@/components/icons";
 import { Niveau } from "@prisma/client";
 import React from "react";
+import { useMyStore } from "@/hooks/zustand";
 
 const formSchema = z.object({
   nom: z.string().min(3, {
@@ -30,6 +31,7 @@ const formSchema = z.object({
   description: z.string().min(3, {
     message: "Description doit contenir au moins 3 caractères.",
   }),
+  id: z.string().optional(),
 });
 
 type NiveauFormProps = {
@@ -38,21 +40,26 @@ type NiveauFormProps = {
 
 export function NiveauForm(props: NiveauFormProps) {
   const queryClient = useQueryClient();
+  const { isUpdate, setIsUpdate } = useMyStore();
   // 1. Define your form.
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      id: props.niv !== undefined && isUpdate ? props.niv.id : "",
       nom: "",
       description: "",
     },
     values: {
-      nom: props.niv !== undefined ? props.niv.nom : "",
-      description: props.niv !== undefined ? props.niv.description : "",
+      id: props.niv !== undefined && isUpdate ? props.niv.id : "",
+      nom: props.niv !== undefined && isUpdate ? props.niv.nom : "",
+      description:
+        props.niv !== undefined && isUpdate ? props.niv.description : "",
     },
   });
 
   type FormValues = {
+    id?: string;
     nom: string;
     description: string;
   };
@@ -62,7 +69,7 @@ export function NiveauForm(props: NiveauFormProps) {
     mutationFn: async (values: FormValues) => {
       await axios.post("http://localhost:3000/api/niveaux", values);
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       form.reset();
 
       queryClient.invalidateQueries(["niveaux"]);
@@ -80,12 +87,41 @@ export function NiveauForm(props: NiveauFormProps) {
     },
   });
 
+  // const vals = {
+  //   id: props.niv?.id,
+
+  //   nom: form.getValues("nom"),
+  //   description: form.getValues("description"),
+  // };
+  // console.log(vals);
+
+  const { mutateAsync, status } = useMutation({
+    mutationKey: ["updateNiveau"],
+    mutationFn: async (values: FormValues) => {
+      await axios.put("http://localhost:3000/api/niveaux", values);
+    },
+    onSuccess: () => {
+      form.reset();
+      setIsUpdate(false);
+      queryClient.invalidateQueries(["niveaux"]);
+      toast({
+        description: "Niveau Mis à jour avec succès ✅",
+      });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
+    },
+  });
+
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
-    mutate(values);
+    isUpdate ? mutateAsync(values) : mutate(values);
   }
 
   return (
@@ -124,18 +160,21 @@ export function NiveauForm(props: NiveauFormProps) {
           )}
         />
         <div className="flex gap-5">
-          <Button type="submit" disabled={isLoading}>
-            {isLoading && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            {props.niv == undefined ? "Ajouter" : "Mettre a jour"}
+          <Button type="submit" disabled={isLoading || status == "loading"}>
+            {isLoading ||
+              (status == "loading" && (
+                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+              ))}
+            {props.niv == undefined || !isUpdate ? "Ajouter" : "Mettre a jour"}
           </Button>
-          {props.niv !== undefined && (
+          {props.niv !== undefined && isUpdate && (
             <Button
               type="reset"
               onClick={() => {
                 // try zustand
                 console.log(props.niv);
+                setIsUpdate(false);
+                form.reset();
               }}
               variant="destructive"
             >

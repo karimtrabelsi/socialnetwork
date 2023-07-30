@@ -25,12 +25,12 @@ export default function OpsPage() {
   };
 
   return (
-    <div className="hidden flex-col md:flex  ">
+    <div className=" flex-col md:flex sm:grid sm:grid-cols-1 ">
       <div className="flex-1 space-y-4 p-8 pt-6 w-full">
         <div className="flex items-center justify-center space-y-2">
           <h2 className="text-3xl font-bold tracking-tight ">Opérations</h2>
         </div>
-        <Tabs defaultValue="niveaux" className="space-y-4">
+        <Tabs defaultValue="niveaux" className="space-y-4 ">
           <TabsList>
             <TabsTrigger value="niveaux">Niveaux</TabsTrigger>
             <TabsTrigger value="options">Options</TabsTrigger>
@@ -41,7 +41,7 @@ export default function OpsPage() {
           </TabsList>
           <TabsContent value="niveaux" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <Card className="col-span-4  border-red-400 dark:border-cyan-600">
+              <Card className="col-span-5  border-red-400 dark:border-cyan-600">
                 <CardHeader>
                   <CardTitle>Tableau</CardTitle>
                 </CardHeader>
@@ -49,7 +49,7 @@ export default function OpsPage() {
                   <DataTableDemo func={getData} />
                 </CardContent>
               </Card>
-              <Card className="col-span-3 border-red-400 dark:border-cyan-600">
+              <Card className="col-span-2 border-red-400 dark:border-cyan-600 ">
                 <CardHeader>
                   <CardTitle>Formulaire</CardTitle>
                 </CardHeader>

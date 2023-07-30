@@ -56,6 +56,7 @@ import {
 } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "@/components/ui/use-toast";
+import { useMyStore } from "@/hooks/zustand";
 
 export type Niveau = {
   id: string;
@@ -114,6 +115,7 @@ export function TableSpinner() {
 
 export function DataTableDemo(props: any) {
   const queryClient = useQueryClient();
+  const { setIsUpdate } = useMyStore();
   const { data, isLoading } = useNiveaux();
   const [selectedNiveau, setSelectedNiveau] = React.useState<Niveau>();
   props.func(selectedNiveau);
@@ -242,6 +244,7 @@ export function DataTableDemo(props: any) {
                   nom: niveau.nom,
                   description: niveau.description,
                 });
+                setIsUpdate(true);
               }}
             >
               <PencilIcon width={"20px"} />
