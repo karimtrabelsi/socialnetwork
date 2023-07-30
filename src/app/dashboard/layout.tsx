@@ -14,6 +14,9 @@ export default async function DashboardLayout({
   if (!session) {
     return redirect("/auth");
   }
+  // if (session?.user?.role !== "ADMIN") {
+  //   return redirect("/");
+  // }
   return (
     <section>
       {/* Include shared UI here e.g. a header or sidebar */}
