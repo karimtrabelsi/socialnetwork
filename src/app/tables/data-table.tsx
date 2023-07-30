@@ -129,7 +129,10 @@ export function DataTableDemo(props: any) {
         },
       };
 
-      await axios.delete(`http://localhost:3000/api/niveaux`, config);
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/niveaux`,
+        config
+      );
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries(["niveaux"]);

@@ -5,7 +5,7 @@ export const useNiveaux = () => {
   return useQuery({
     queryKey: ["niveaux"],
     queryFn: async () =>
-      await fetch(`http://localhost:3000/api/niveaux`).then((res) =>
+      await fetch(`${process.env.NEXT_PUBLIC_SERVER}/api/niveaux`).then((res) =>
         res.json()
       ),
   });

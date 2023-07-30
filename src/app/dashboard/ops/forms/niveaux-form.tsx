@@ -67,7 +67,7 @@ export function NiveauForm(props: NiveauFormProps) {
   const { mutate, isLoading } = useMutation({
     mutationKey: ["createNiveau"],
     mutationFn: async (values: FormValues) => {
-      await axios.post("http://localhost:3000/api/niveaux", values);
+      await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/niveaux`, values);
     },
     onSuccess: () => {
       form.reset();
@@ -98,7 +98,7 @@ export function NiveauForm(props: NiveauFormProps) {
   const { mutateAsync, status } = useMutation({
     mutationKey: ["updateNiveau"],
     mutationFn: async (values: FormValues) => {
-      await axios.put("http://localhost:3000/api/niveaux", values);
+      await axios.put(`${process.env.NEXT_PUBLIC_SERVER}/api/niveaux`, values);
     },
     onSuccess: () => {
       form.reset();
