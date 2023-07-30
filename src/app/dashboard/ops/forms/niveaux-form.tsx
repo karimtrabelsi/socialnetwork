@@ -20,9 +20,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Icons } from "@/components/icons";
-import { Niveau } from "@prisma/client";
 import React from "react";
 import { useMyStore } from "@/hooks/zustand";
+import { Niveau } from "@/app/tables/data-table";
 
 const formSchema = z.object({
   nom: z.string().min(3, {

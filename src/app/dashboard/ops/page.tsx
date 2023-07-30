@@ -1,5 +1,5 @@
 "use client";
-import { DataTableDemo } from "@/app/tables/data-table";
+import { DataTableDemo, Niveau } from "@/app/tables/data-table";
 import {
   Card,
   CardContent,
@@ -10,7 +10,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Metadata } from "next";
 import { NiveauForm } from "./forms/niveaux-form";
-import { Niveau } from "@prisma/client";
 import React from "react";
 
 const metadata: Metadata = {

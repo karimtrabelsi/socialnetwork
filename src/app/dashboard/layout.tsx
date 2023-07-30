@@ -2,12 +2,18 @@ import { ModeToggle } from "@/components/theme-toggle";
 import { MainNav } from "./components/main-nav";
 import TeamSwitcher from "./components/team-switcher";
 import { UserNav } from "./components/user-nav";
+import { getAuthSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function DashboardLayout({
-  children, // will be a page or nested layout
+export default async function DashboardLayout({
+  children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getAuthSession();
+  if (!session) {
+    return redirect("/auth");
+  }
   return (
     <section>
       {/* Include shared UI here e.g. a header or sidebar */}
@@ -18,12 +24,11 @@ export default function DashboardLayout({
             <MainNav className="mx-6" />
             <div className="ml-auto flex items-center space-x-4">
               <ModeToggle />
-              <UserNav />
+              {session && <UserNav user={session?.user} />}
             </div>
           </div>
         </div>
       </div>
-
       {children}
     </section>
   );
