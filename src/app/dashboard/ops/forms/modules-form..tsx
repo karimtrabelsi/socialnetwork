@@ -24,6 +24,11 @@ import React from "react";
 import { useMyStore } from "@/hooks/zustand";
 import { Module } from "@prisma/client";
 
+import { addDays, format } from "date-fns";
+import { DateRange, DayPicker } from "react-day-picker";
+import { Calendar } from "@/components/ui/calendar";
+import { fr } from "date-fns/locale";
+
 const formSchema = z.object({
   nom: z.string().min(3, {
     message: "Nom doit contenir au moins 3 caractères.",
@@ -56,7 +61,18 @@ type ModuleFormProps = {
   mod: Module | undefined;
 };
 
+const pastMonth = new Date();
+
 export function ModuleForm(props: ModuleFormProps) {
+  const defaultSelected: DateRange = {
+    from: pastMonth,
+    to: addDays(pastMonth, 4),
+  };
+  const [range, setRange] = React.useState<DateRange | undefined>(
+    defaultSelected
+  );
+  console.log(range);
+
   const queryClient = useQueryClient();
   const { isUpdate, setIsUpdate } = useMyStore();
   // 1. Define your form.
@@ -67,7 +83,14 @@ export function ModuleForm(props: ModuleFormProps) {
       id: props.mod !== undefined && isUpdate ? props.mod.id : "",
       nom: "",
       semestre: 0,
-      periode: "",
+      periode:
+        range?.from && range?.to
+          ? `${format(range.from, "PPP", {
+              locale: fr,
+            })}–${format(range.to, "PPP", {
+              locale: fr,
+            })}`
+          : "",
       chargeHoraire: 0,
       credits: 0,
     },
@@ -75,7 +98,14 @@ export function ModuleForm(props: ModuleFormProps) {
       id: props.mod !== undefined && isUpdate ? props.mod.id : "",
       nom: props.mod !== undefined && isUpdate ? props.mod.nom : "",
       semestre: props.mod !== undefined && isUpdate ? props.mod.semestre : 0,
-      periode: props.mod !== undefined && isUpdate ? props.mod.periode : "",
+      periode:
+        range?.from && range?.to
+          ? `${format(range.from, "PPP", {
+              locale: fr,
+            })}–${format(range.to, "PPP", {
+              locale: fr,
+            })}`
+          : "",
       chargeHoraire:
         props.mod !== undefined && isUpdate ? props.mod.chargeHoraire : 0,
       credits: props.mod !== undefined && isUpdate ? props.mod.credits : 0,
@@ -181,17 +211,18 @@ export function ModuleForm(props: ModuleFormProps) {
         <FormField
           control={form.control}
           name="periode"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormLabel>Periode</FormLabel>
-              <FormControl>
-                <Input
-                  autoComplete="off"
-                  placeholder="Saisir semestre"
-                  {...field}
-                />
-              </FormControl>
-
+              <Calendar
+                id="test"
+                mode="range"
+                defaultMonth={pastMonth}
+                selected={range}
+                locale={fr}
+                onSelect={setRange}
+                className="rounded-md border"
+              />
               <FormMessage />
             </FormItem>
           )}
