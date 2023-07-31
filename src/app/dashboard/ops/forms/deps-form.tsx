@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
@@ -8,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,7 +20,7 @@ import axios from "axios";
 import { Icons } from "@/components/icons";
 import React from "react";
 import { useMyStore } from "@/hooks/zustand";
-import { Niveau } from "@/app/tables/data-table";
+import { Departement } from "@prisma/client";
 
 const formSchema = z.object({
   nom: z.string().min(3, {
@@ -34,11 +32,11 @@ const formSchema = z.object({
   id: z.string().optional(),
 });
 
-type NiveauFormProps = {
-  niv: Niveau | undefined;
+type DepartementFormProps = {
+  dep: Departement | undefined;
 };
 
-export function NiveauForm(props: NiveauFormProps) {
+export function DepartementForm(props: DepartementFormProps) {
   const queryClient = useQueryClient();
   const { isUpdate, setIsUpdate } = useMyStore();
   // 1. Define your form.
@@ -46,15 +44,15 @@ export function NiveauForm(props: NiveauFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      id: props.niv !== undefined && isUpdate ? props.niv.id : "",
+      id: props.dep !== undefined && isUpdate ? props.dep.id : "",
       nom: "",
       description: "",
     },
     values: {
-      id: props.niv !== undefined && isUpdate ? props.niv.id : "",
-      nom: props.niv !== undefined && isUpdate ? props.niv.nom : "",
+      id: props.dep !== undefined && isUpdate ? props.dep.id : "",
+      nom: props.dep !== undefined && isUpdate ? props.dep.nom : "",
       description:
-        props.niv !== undefined && isUpdate ? props.niv.description : "",
+        props.dep !== undefined && isUpdate ? props.dep.description : "",
     },
   });
 
@@ -65,17 +63,19 @@ export function NiveauForm(props: NiveauFormProps) {
   };
 
   const { mutate, isLoading } = useMutation({
-    mutationKey: ["createNiveau"],
+    mutationKey: ["createDepartement"],
     mutationFn: async (values: FormValues) => {
-      await axios.post(`${process.env.NEXT_PUBLIC_SERVER}/api/niveaux`, values);
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/departements`,
+        values
+      );
     },
     onSuccess: () => {
       form.reset();
 
-      queryClient.invalidateQueries(["niveaux"]);
-      // queryClient.setQueryData(["niveaux"], (old: any) => [old, data]);
+      queryClient.invalidateQueries(["departements"]);
       toast({
-        description: "Niveau Ajouté avec succès ✅",
+        description: "Departement Ajouté avec succès ✅",
       });
     },
     onError: () => {
@@ -86,26 +86,20 @@ export function NiveauForm(props: NiveauFormProps) {
       });
     },
   });
-
-  // const vals = {
-  //   id: props.niv?.id,
-
-  //   nom: form.getValues("nom"),
-  //   description: form.getValues("description"),
-  // };
-  // console.log(vals);
-
   const { mutateAsync, status } = useMutation({
-    mutationKey: ["updateNiveau"],
+    mutationKey: ["updateDepartement"],
     mutationFn: async (values: FormValues) => {
-      await axios.put(`${process.env.NEXT_PUBLIC_SERVER}/api/niveaux`, values);
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/departements`,
+        values
+      );
     },
     onSuccess: () => {
       form.reset();
       setIsUpdate(false);
-      queryClient.invalidateQueries(["niveaux"]);
+      queryClient.invalidateQueries(["departements"]);
       toast({
-        description: "Niveau Mis à jour avec succès ✅",
+        description: "Departement Mis à jour avec succès ✅",
       });
     },
     onError: () => {
@@ -132,7 +126,7 @@ export function NiveauForm(props: NiveauFormProps) {
           name="nom"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nom Module</FormLabel>
+              <FormLabel>Nom Departement</FormLabel>
               <FormControl>
                 <Input autoComplete="off" placeholder="Saisir nom" {...field} />
               </FormControl>
@@ -146,7 +140,7 @@ export function NiveauForm(props: NiveauFormProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description Module</FormLabel>
+              <FormLabel>Description Departement</FormLabel>
               <FormControl>
                 <Input
                   autoComplete="off"
@@ -167,14 +161,14 @@ export function NiveauForm(props: NiveauFormProps) {
             {status == "loading" && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )}
-            {props.niv == undefined || !isUpdate ? "Ajouter" : "Mettre a jour"}
+            {props.dep == undefined || !isUpdate ? "Ajouter" : "Mettre a jour"}
           </Button>
-          {props.niv !== undefined && isUpdate && (
+          {props.dep !== undefined && isUpdate && (
             <Button
               type="reset"
               onClick={() => {
                 // try zustand
-                console.log(props.niv);
+                console.log(props.dep);
                 setIsUpdate(false);
                 form.reset();
               }}

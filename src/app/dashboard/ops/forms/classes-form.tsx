@@ -150,10 +150,12 @@ export function ClasseForm(props: ClasseFormProps) {
         />
         <div className="flex gap-5">
           <Button type="submit" disabled={isLoading || status == "loading"}>
-            {isLoading ||
-              (status == "loading" && (
-                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-              ))}
+            {isLoading && (
+              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            {status == "loading" && (
+              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+            )}
             {props.cls == undefined || !isUpdate ? "Ajouter" : "Mettre a jour"}
           </Button>
           {props.cls !== undefined && isUpdate && (
