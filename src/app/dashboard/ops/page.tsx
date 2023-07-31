@@ -11,6 +11,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Metadata } from "next";
 import { NiveauForm } from "./forms/niveaux-form";
 import React from "react";
+import { OptionForm } from "./forms/options-form";
+import { Classe, Option } from "@prisma/client";
+import { OptionsTable } from "@/app/tables/options-table";
+import { ClassesTable } from "@/app/tables/classes-table";
+import { ClasseForm } from "./forms/classes-form";
 
 const metadata: Metadata = {
   title: "Dashboard",
@@ -19,8 +24,16 @@ const metadata: Metadata = {
 
 export default function OpsPage() {
   const [niveaux, setNiveaux] = React.useState<Niveau>();
+  const [option, setOption] = React.useState<Option>();
+  const [classe, setClasse] = React.useState<Classe>();
   const getData = async (data: Niveau) => {
     setNiveaux(data);
+  };
+  const getOption = async (data: Option) => {
+    setOption(data);
+  };
+  const getClasse = async (data: Classe) => {
+    setClasse(data);
   };
 
   return (
@@ -54,6 +67,46 @@ export default function OpsPage() {
                 </CardHeader>
                 <CardContent>
                   <NiveauForm niv={niveaux} />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          <TabsContent value="options" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <Card className="col-span-5  border-red-400 dark:border-cyan-600">
+                <CardHeader>
+                  <CardTitle>Tableau</CardTitle>
+                </CardHeader>
+                <CardContent className="pl-2">
+                  <OptionsTable func={getOption} />
+                </CardContent>
+              </Card>
+              <Card className="col-span-2 border-red-400 dark:border-cyan-600 ">
+                <CardHeader>
+                  <CardTitle>Formulaire</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <OptionForm opt={option} />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          <TabsContent value="classes" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <Card className="col-span-5  border-red-400 dark:border-cyan-600">
+                <CardHeader>
+                  <CardTitle>Tableau</CardTitle>
+                </CardHeader>
+                <CardContent className="pl-2">
+                  <ClassesTable func={getClasse} />
+                </CardContent>
+              </Card>
+              <Card className="col-span-2 border-red-400 dark:border-cyan-600 ">
+                <CardHeader>
+                  <CardTitle>Formulaire</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ClasseForm cls={classe} />
                 </CardContent>
               </Card>
             </div>

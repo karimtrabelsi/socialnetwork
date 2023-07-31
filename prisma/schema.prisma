@@ -22,6 +22,26 @@ model Niveau {
     nom       String
     description String
 }
+model Option {
+    id        String   @id @default(cuid())
+    nom       String
+    description String
+}
+model Classe {
+    id        String   @id @default(cuid())
+    nom       String
+    description String
+}
+model Departement {
+    id        String   @id @default(cuid())
+    nom       String
+    description String
+}
+model Up {
+    id        String   @id @default(cuid())
+    nom       String
+    description String
+}
 
 // Necessary for Next auth
 model Account {
