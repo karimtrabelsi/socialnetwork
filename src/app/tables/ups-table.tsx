@@ -80,7 +80,7 @@ export function UpsTable(props: any) {
         },
       };
 
-      await axios.delete(`${process.env.NEXT_PUBLIC_SERVER}/api/up`, config);
+      await axios.delete(`${process.env.NEXT_PUBLIC_SERVER}/api/ups`, config);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries(["up"]);

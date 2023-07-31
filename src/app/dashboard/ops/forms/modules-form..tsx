@@ -62,7 +62,7 @@ export function ModuleForm(props: ModuleFormProps) {
   const [range, setRange] = React.useState<DateRange | undefined>(
     defaultSelected
   );
-  console.log(range);
+  console.log(props.mod);
 
   const queryClient = useQueryClient();
   const { isUpdate, setIsUpdate } = useMyStore();
@@ -158,6 +158,7 @@ export function ModuleForm(props: ModuleFormProps) {
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     isUpdate ? mutateAsync(values) : mutate(values);
