@@ -43,6 +43,15 @@ model Up {
     description String
 }
 
+model Module {
+  id       String   @id @default(cuid())
+  nom      String
+  semestre Int
+  periode String
+  chargeHoraire Int
+  credits Int
+}
+
 // Necessary for Next auth
 model Account {
   id                 String  @id @default(cuid())
