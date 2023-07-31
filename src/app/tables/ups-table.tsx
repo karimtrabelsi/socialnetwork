@@ -83,7 +83,7 @@ export function UpsTable(props: any) {
       await axios.delete(`${process.env.NEXT_PUBLIC_SERVER}/api/ups`, config);
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["up"]);
+      queryClient.invalidateQueries(["ups"]);
       toast({
         description: "Up supprimée avec succès ✅",
       });

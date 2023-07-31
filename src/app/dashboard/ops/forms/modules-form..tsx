@@ -73,7 +73,7 @@ export function ModuleForm(props: ModuleFormProps) {
     defaultValues: {
       id: props.mod !== undefined && isUpdate ? props.mod.id : "",
       nom: "",
-      semestre: 0,
+      semestre: undefined,
       periode:
         range?.from && range?.to
           ? `${format(range.from, "PPP", {
@@ -82,8 +82,8 @@ export function ModuleForm(props: ModuleFormProps) {
               locale: fr,
             })}`
           : "",
-      chargeHoraire: 0,
-      credits: 0,
+      chargeHoraire: undefined,
+      credits: undefined,
     },
     values: {
       id: props.mod !== undefined && isUpdate ? props.mod.id : "",
