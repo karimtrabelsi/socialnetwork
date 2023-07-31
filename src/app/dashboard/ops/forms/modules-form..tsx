@@ -33,27 +33,18 @@ const formSchema = z.object({
   nom: z.string().min(3, {
     message: "Nom doit contenir au moins 3 caractères.",
   }),
-  semestre: z.coerce
-    .number()
-    .min(1, {
-      message: "Semestre doit contenir au moins 1 caractère.",
-    })
-    .nullable(),
+  semestre: z.coerce.number().min(1, {
+    message: "Semestre doit contenir au moins 1 caractère.",
+  }),
   periode: z.string().min(1, {
     message: "Période doit contenir au moins 5 caractères.",
   }),
-  chargeHoraire: z.coerce
-    .number()
-    .min(1, {
-      message: "Charge Horaire doit contenir au moins 1 caractère.",
-    })
-    .nullable(),
-  credits: z.coerce
-    .number()
-    .min(1, {
-      message: "Crédits doit contenir au moins 1 caractère.",
-    })
-    .nullable(),
+  chargeHoraire: z.coerce.number().min(1, {
+    message: "Charge Horaire doit contenir au moins 1 caractère.",
+  }),
+  credits: z.coerce.number().min(1, {
+    message: "Crédits doit contenir au moins 1 caractère.",
+  }),
   id: z.string().optional(),
 });
 
@@ -197,7 +188,6 @@ export function ModuleForm(props: ModuleFormProps) {
               <FormLabel>Semestre</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
                   autoComplete="off"
                   placeholder="Saisir semestre"
                   {...field}
@@ -235,7 +225,6 @@ export function ModuleForm(props: ModuleFormProps) {
               <FormLabel>Charge Horaire</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
                   autoComplete="off"
                   placeholder="Saisir charge horaire /heures"
                   {...field}
@@ -254,7 +243,6 @@ export function ModuleForm(props: ModuleFormProps) {
               <FormLabel>Crédits</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
                   autoComplete="off"
                   placeholder="Saisir nombre de crédits"
                   {...field}
