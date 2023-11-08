@@ -1,0 +1,4 @@
+un enseignant assure 189h par semestre ( 5 créneaux/4 ccréneaux) ou (6/3)
+un coordinateur 168
+un enseignant peut assurer 2 créneaux symfony et 3 c angular pendant une pérdiode
+Affectation : nombre de classes à affecter 

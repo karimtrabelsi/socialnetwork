@@ -50,12 +50,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "@/components/ui/use-toast";
 import { useMyStore } from "@/hooks/zustand";
-
-export type Niveau = {
-  id: string;
-  nom: string;
-  description: string;
-};
+import { Niveau } from "@prisma/client";
 
 export function TableSpinner() {
   return (
@@ -167,11 +162,7 @@ export function DataTableDemo(props: any) {
       enableSorting: false,
       enableHiding: false,
     },
-    {
-      accessorKey: "id",
-      header: "ID",
-      cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
-    },
+
     {
       accessorKey: "nom",
       header: ({ column }) => {
@@ -186,14 +177,17 @@ export function DataTableDemo(props: any) {
           </Button>
         );
       },
-      cell: ({ row }) => <div className="lowercase">{row.getValue("nom")}</div>,
+      cell: ({ row }) => <div>{row.getValue("nom")}</div>,
     },
     {
-      accessorKey: "description",
-      header: "Description",
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("description")}</div>
-      ),
+      accessorKey: "anneeScolaire",
+      header: "Année scolaire",
+      cell: ({ row }) => <div>{row.getValue("anneeScolaire")}</div>,
+    },
+    {
+      accessorKey: "nbrClasses",
+      header: "Nombre de Classes",
+      cell: ({ row }) => <div>{row.getValue("nbrClasses")}</div>,
     },
 
     {
@@ -240,7 +234,8 @@ export function DataTableDemo(props: any) {
                 setSelectedNiveau({
                   id: niveau.id,
                   nom: niveau.nom,
-                  description: niveau.description,
+                  anneeScolaire: niveau.anneeScolaire,
+                  nbrClasses: niveau.nbrClasses,
                 });
                 setIsUpdate(true);
               }}
@@ -284,7 +279,7 @@ export function DataTableDemo(props: any) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
+          placeholder="Recherche par nom"
           value={(table.getColumn("nom")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("nom")?.setFilterValue(event.target.value)

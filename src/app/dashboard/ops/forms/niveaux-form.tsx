@@ -1,35 +1,35 @@
 "use client";
 
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
+import { useMyStore } from "@/hooks/zustand";
+import { Niveau } from "@prisma/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Icons } from "@/components/icons";
-import React from "react";
-import { useMyStore } from "@/hooks/zustand";
-import { Niveau } from "@/app/tables/data-table";
+import { useForm } from "react-hook-form";
 
 const formSchema = z.object({
-  nom: z.string().min(3, {
-    message: "Nom doit contenir au moins 3 caractères.",
+  nom: z.string().min(2, {
+    message: "Nom doit contenir au moins 2 caractères.",
   }),
-  description: z.string().min(3, {
-    message: "Description doit contenir au moins 3 caractères.",
+  anneeScolaire: z.string().min(3, {
+    message: "anneeScolaire doit contenir au moins 3 caractères.",
+  }),
+  nbrClasses: z.coerce.number().min(1, {
+    message: "anneeScolaire doit contenir au moins 3 caractères.",
   }),
   id: z.string().optional(),
 });
@@ -48,20 +48,24 @@ export function NiveauForm(props: NiveauFormProps) {
     defaultValues: {
       id: props.niv !== undefined && isUpdate ? props.niv.id : "",
       nom: "",
-      description: "",
+      anneeScolaire: "",
+      nbrClasses: undefined,
     },
     values: {
       id: props.niv !== undefined && isUpdate ? props.niv.id : "",
       nom: props.niv !== undefined && isUpdate ? props.niv.nom : "",
-      description:
-        props.niv !== undefined && isUpdate ? props.niv.description : "",
+      anneeScolaire:
+        props.niv !== undefined && isUpdate ? props.niv.anneeScolaire : "",
+      nbrClasses:
+        props.niv !== undefined && isUpdate ? props.niv.nbrClasses : 0,
     },
   });
 
   type FormValues = {
     id?: string;
     nom: string;
-    description: string;
+    anneeScolaire: string;
+    nbrClasses: number | null;
   };
 
   const { mutate, isLoading } = useMutation({
@@ -86,14 +90,6 @@ export function NiveauForm(props: NiveauFormProps) {
       });
     },
   });
-
-  // const vals = {
-  //   id: props.niv?.id,
-
-  //   nom: form.getValues("nom"),
-  //   description: form.getValues("description"),
-  // };
-  // console.log(vals);
 
   const { mutateAsync, status } = useMutation({
     mutationKey: ["updateNiveau"],
@@ -143,14 +139,32 @@ export function NiveauForm(props: NiveauFormProps) {
         />
         <FormField
           control={form.control}
-          name="description"
+          name="anneeScolaire"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description Module</FormLabel>
+              <FormLabel>Année Scolaire</FormLabel>
               <FormControl>
                 <Input
                   autoComplete="off"
-                  placeholder="Saisir description"
+                  placeholder="Saisir année scolaire"
+                  {...field}
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="nbrClasses"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nombre de Classes</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="off"
+                  placeholder="Saisir nombre de classes"
                   {...field}
                 />
               </FormControl>

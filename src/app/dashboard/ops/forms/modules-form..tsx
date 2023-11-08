@@ -1,33 +1,36 @@
 "use client";
 
-import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 
+import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
 import { useToast } from "@/components/ui/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { Icons } from "@/components/icons";
-import React from "react";
 import { useMyStore } from "@/hooks/zustand";
-import { Module } from "@prisma/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Module, Niveau } from "@prisma/client";
+import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import React from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
-import { addDays, format } from "date-fns";
-import { DateRange, DayPicker } from "react-day-picker";
-import { Calendar } from "@/components/ui/calendar";
-import { fr } from "date-fns/locale";
+import { addDays } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 const formSchema = z.object({
   nom: z.string().min(3, {
@@ -46,6 +49,7 @@ const formSchema = z.object({
     message: "Crédits doit contenir au moins 1 caractère.",
   }),
   id: z.string().optional(),
+  niveaux: z.string().array().optional(),
 });
 
 type ModuleFormProps = {
@@ -55,17 +59,13 @@ type ModuleFormProps = {
 const pastMonth = new Date();
 
 export function ModuleForm(props: ModuleFormProps) {
-  const defaultSelected: DateRange = {
-    from: pastMonth,
-    to: addDays(pastMonth, 4),
-  };
-  const [range, setRange] = React.useState<DateRange | undefined>(
-    defaultSelected
-  );
   console.log(props.mod);
 
   const queryClient = useQueryClient();
   const { isUpdate, setIsUpdate } = useMyStore();
+  const [niv, setNiv] = React.useState<string[]>([]);
+
+  console.log(niv);
   // 1. Define your form.
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -74,32 +74,20 @@ export function ModuleForm(props: ModuleFormProps) {
       id: props.mod !== undefined && isUpdate ? props.mod.id : "",
       nom: "",
       semestre: undefined,
-      periode:
-        range?.from && range?.to
-          ? `${format(range.from, "PPP", {
-              locale: fr,
-            })}–${format(range.to, "PPP", {
-              locale: fr,
-            })}`
-          : "",
+      periode: "",
       chargeHoraire: undefined,
       credits: undefined,
+      niveaux: niv,
     },
     values: {
       id: props.mod !== undefined && isUpdate ? props.mod.id : "",
       nom: props.mod !== undefined && isUpdate ? props.mod.nom : "",
       semestre: props.mod !== undefined && isUpdate ? props.mod.semestre : 0,
-      periode:
-        range?.from && range?.to
-          ? `${format(range.from, "PPP", {
-              locale: fr,
-            })}–${format(range.to, "PPP", {
-              locale: fr,
-            })}`
-          : "",
+      periode: props.mod !== undefined && isUpdate ? props.mod.periode : "",
       chargeHoraire:
         props.mod !== undefined && isUpdate ? props.mod.chargeHoraire : 0,
       credits: props.mod !== undefined && isUpdate ? props.mod.credits : 0,
+      niveaux: niv,
     },
   });
 
@@ -110,6 +98,7 @@ export function ModuleForm(props: ModuleFormProps) {
     periode: string;
     chargeHoraire: number | null;
     credits: number | null;
+    niveaux: string[];
   };
 
   const { mutate, isLoading } = useMutation({
@@ -140,6 +129,7 @@ export function ModuleForm(props: ModuleFormProps) {
       await axios.put(`${process.env.NEXT_PUBLIC_SERVER}/api/modules`, values);
     },
     onSuccess: () => {
+      console.log(form.getValues());
       form.reset();
       setIsUpdate(false);
       queryClient.invalidateQueries(["modules"]);
@@ -158,12 +148,23 @@ export function ModuleForm(props: ModuleFormProps) {
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     isUpdate ? mutateAsync(values) : mutate(values);
   }
+  type Checked = DropdownMenuCheckboxItemProps["checked"];
+  const { data, isFetched } = useQuery({
+    queryKey: ["niveaux"],
+    queryFn: async () => {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER}/api/niveaux`);
+      const data = await res.json();
+      return data.niveaux;
+    },
+  });
 
+  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
+  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
+  const [showPanel, setShowPanel] = React.useState<Checked>(false);
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -202,18 +203,17 @@ export function ModuleForm(props: ModuleFormProps) {
         <FormField
           control={form.control}
           name="periode"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
-              <FormLabel>Periode</FormLabel>
-              <Calendar
-                id="test"
-                mode="range"
-                defaultMonth={pastMonth}
-                selected={range}
-                locale={fr}
-                onSelect={setRange}
-                className="rounded-md border"
-              />
+              <FormLabel>Période</FormLabel>
+              <FormControl>
+                <Input
+                  autoComplete="off"
+                  placeholder="Saisir période"
+                  {...field}
+                />
+              </FormControl>
+
               <FormMessage />
             </FormItem>
           )}
@@ -254,6 +254,40 @@ export function ModuleForm(props: ModuleFormProps) {
             </FormItem>
           )}
         />
+        {data.niveau ? (
+          <FormField
+            control={form.control}
+            name="niveaux"
+            render={({ field }) => (
+              <FormItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">Niveaux</Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    {data.niveau.map((niveau: Niveau) => (
+                      <DropdownMenuCheckboxItem
+                        key={niveau.id}
+                        checked={niv.includes(niveau.id) ? true : false}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setNiv([...niv, niveau.id]);
+                          } else {
+                            setNiv(niv.filter((id) => id !== niveau.id));
+                          }
+                        }}
+                      >
+                        {niveau.nom}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ) : null}
         <div className="flex gap-5">
           <Button type="submit" disabled={isLoading || status == "loading"}>
             {isLoading && (

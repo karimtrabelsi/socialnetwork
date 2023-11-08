@@ -60,12 +60,6 @@ import { Classe, Option } from "@prisma/client";
 import { useOptions } from "@/hooks/options";
 import { useClasses } from "@/hooks/classes";
 
-export type Niveau = {
-  id: string;
-  nom: string;
-  description: string;
-};
-
 export function TableSpinner() {
   return (
     <>
@@ -198,10 +192,10 @@ export function ClassesTable(props: any) {
       cell: ({ row }) => <div className="lowercase">{row.getValue("nom")}</div>,
     },
     {
-      accessorKey: "description",
+      accessorKey: "niveauId",
       header: "Description",
       cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("description")}</div>
+        <div className="lowercase">{row.getValue("niveauId")}</div>
       ),
     },
 
@@ -249,7 +243,7 @@ export function ClassesTable(props: any) {
                 setSelectedClasse({
                   id: classe.id,
                   nom: classe.nom,
-                  description: classe.description,
+                  niveauId: classe.niveauId,
                 });
                 setIsUpdate(true);
               }}

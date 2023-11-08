@@ -8,13 +8,23 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { nom, description } = body;
+  const { nom, anneeScolaire, nbrClasses } = body;
   const niveau = await db.niveau.create({
     data: {
       nom,
-      description,
+      anneeScolaire,
+      nbrClasses,
+      classes: {
+        createMany: {
+          data: Array.from({ length: nbrClasses }, (_, i) => ({
+            nom: `${nom}${i + 1}`,
+          })),
+        },
+      },
     },
+    include: { classes: true },
   });
+
   return NextResponse.json({ niveau });
 }
 
@@ -31,14 +41,15 @@ export async function DELETE(req: Request) {
 
 export async function PUT(req: Request) {
   const body = await req.json();
-  const { id, nom, description } = body;
+  const { id, nom, anneeScolaire, nbrClasses } = body;
   const niveau = await db.niveau.update({
     where: {
       id: id,
     },
     data: {
       nom: nom,
-      description: description,
+      anneeScolaire: anneeScolaire,
+      nbrClasses: nbrClasses,
     },
   });
   return NextResponse.json({ niveau });

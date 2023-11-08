@@ -20,27 +20,42 @@ model Example {
 model Niveau {
     id        String   @id @default(cuid())
     nom       String
-    description String
+    nbrClasses Int
+    anneeScolaire String
+    classes Classe[]
+
 }
 model Option {
     id        String   @id @default(cuid())
     nom       String
     description String
+    departId String
+    dept     Departement @relation(fields: [departId], references: [id])
 }
 model Classe {
     id        String   @id @default(cuid())
     nom       String
-    description String
+    niveau Niveau @relation(fields: [niveauId], references: [id])
+    niveauId String
+    modules Module[]
+    enseignants User[]
+    @@index([niveauId])
 }
 model Departement {
     id        String   @id @default(cuid())
     nom       String
     description String
+    ups    Up[]
+    options Option[]
+    // enseignants User[]
 }
 model Up {
     id        String   @id @default(cuid())
     nom       String
     description String
+    deptId String
+    depart     Departement @relation(fields: [deptId], references: [id])
+    enseignants User[]
 }
 
 model Module {
@@ -48,8 +63,11 @@ model Module {
   nom      String
   semestre Int
   periode String
-  chargeHoraire Int
+  chargeHoraire Int @default(0)
   credits Int
+  enseignants User[]
+  classes Classe[]
+  competences Competence[]
 }
 
 // Necessary for Next auth
@@ -80,6 +98,15 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Competence {
+  id       String   @id @default(cuid())
+  nom      String
+  description String
+  moduleId String
+  module Module @relation(fields: [moduleId], references: [id])
+  enseignants User[]
+}
+
 enum UserRole {
     ADMIN
     COORDINATEUR
@@ -92,7 +119,15 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  etat String?
+  details String?
+  charge Int? @default(0)
   role         UserRole  @default(ENSEIGNANT)
+  classes Classe[]
+  modules Module[]
+  up Up[]
+  // departement Departement? @relation(fields: [id], references: [id])
+  competences Competence[]
   accounts      Account[]
   sessions      Session[]
 }

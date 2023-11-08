@@ -1,22 +1,29 @@
 import { ModeToggle } from "@/components/theme-toggle";
-import { MainNav } from "./components/main-nav";
-import TeamSwitcher from "./components/team-switcher";
-import { UserNav } from "./components/user-nav";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import TeamSwitcher from "../dashboard/components/team-switcher";
+import { MainNav } from "../dashboard/components/main-nav";
+import { UserNav } from "../dashboard/components/user-nav";
 
 export default async function DashboardLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: {
+    userId: string;
+  };
 }) {
   const session = await getAuthSession();
+  params.userId = session?.user?.id || "";
   if (!session) {
     return redirect("/auth");
   }
-  if (session?.user?.role !== "ADMIN") {
-    return redirect("/tasks");
+
+  if (session?.user?.role !== "ENSEIGNANT") {
+    return redirect("/teacher");
   }
+
   return (
     <section>
       {/* Include shared UI here e.g. a header or sidebar */}

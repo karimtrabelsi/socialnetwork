@@ -1,28 +1,34 @@
 "use client";
 
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { Icons } from "@/components/icons";
-import React from "react";
 import { useMyStore } from "@/hooks/zustand";
-import { Option, Up } from "@prisma/client";
+import { Departement, Up } from "@prisma/client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useForm } from "react-hook-form";
 
 const formSchema = z.object({
   nom: z.string().min(3, {
@@ -32,6 +38,7 @@ const formSchema = z.object({
     message: "Description doit contenir au moins 3 caractères.",
   }),
   id: z.string().optional(),
+  departement: z.string(),
 });
 
 type UpFormProps = {
@@ -41,6 +48,16 @@ type UpFormProps = {
 export function UpForm(props: UpFormProps) {
   const queryClient = useQueryClient();
   const { isUpdate, setIsUpdate } = useMyStore();
+  const { data } = useQuery({
+    queryKey: ["deps"],
+    queryFn: async () => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/departements`
+      );
+      const data = await res.json();
+      return data.departement;
+    },
+  });
   // 1. Define your form.
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,12 +66,14 @@ export function UpForm(props: UpFormProps) {
       id: props.up !== undefined && isUpdate ? props.up.id : "",
       nom: "",
       description: "",
+      departement: "",
     },
     values: {
       id: props.up !== undefined && isUpdate ? props.up.id : "",
       nom: props.up !== undefined && isUpdate ? props.up.nom : "",
       description:
         props.up !== undefined && isUpdate ? props.up.description : "",
+      departement: props.up !== undefined && isUpdate ? props.up.deptId : "",
     },
   });
 
@@ -149,6 +168,38 @@ export function UpForm(props: UpFormProps) {
             </FormItem>
           )}
         />
+        {data ? (
+          <FormField
+            control={form.control}
+            rules={{ required: true }}
+            name="departement"
+            render={({ field }) => (
+              <FormItem>
+                <Select onValueChange={field.onChange}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue
+                      defaultValue={field.value}
+                      placeholder="Selectionner un dept"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Départements</SelectLabel>
+                      {data.map((dept: Departement) => (
+                        <SelectItem key={dept.id} value={dept.id}>
+                          {dept.nom}
+
+                          {<input type="hidden" {...field} />}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ) : null}
         <div className="flex gap-5">
           <Button type="submit" disabled={isLoading || status == "loading"}>
             {isLoading && (

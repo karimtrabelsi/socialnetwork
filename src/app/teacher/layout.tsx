@@ -1,9 +1,9 @@
 import { ModeToggle } from "@/components/theme-toggle";
-import { MainNav } from "./components/main-nav";
-import TeamSwitcher from "./components/team-switcher";
-import { UserNav } from "./components/user-nav";
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import TeamSwitcher from "../dashboard/components/team-switcher";
+import { MainNav } from "../dashboard/components/main-nav";
+import { UserNav } from "../dashboard/components/user-nav";
 
 export default async function DashboardLayout({
   children,
@@ -14,7 +14,7 @@ export default async function DashboardLayout({
   if (!session) {
     return redirect("/auth");
   }
-  if (session?.user?.role !== "ADMIN") {
+  if (session?.user?.role !== "COORDINATEUR") {
     return redirect("/tasks");
   }
   return (

@@ -8,11 +8,17 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { nom, description } = body;
+  const { nom, description, departement } = body;
+  console.log("dep", departement);
   const option = await db.option.create({
     data: {
       nom,
       description,
+      dept: {
+        connect: {
+          id: departement,
+        },
+      },
     },
   });
   return NextResponse.json({ option });
